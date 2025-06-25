@@ -1,0 +1,5 @@
+/* Tambahkan border di sebelah kanan sidebar */
+.fi-sidebar {
+    border-right: 1px solid #e5e7eb; /* Tailwind gray-200 */
+    background-color: #f9fafb;       /* Tailwind gray-50 */
+}
