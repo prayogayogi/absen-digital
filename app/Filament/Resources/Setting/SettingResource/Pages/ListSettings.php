@@ -28,9 +28,9 @@ class ListSettings extends ListRecords
     {
 
         $categories = Setting::distinct()->pluck('category')->toArray();
-        $tabs = [
-            'All' => Tab::make('All'),
-        ];
+        // $tabs = [
+        //     'All' => Tab::make('All'),
+        // ];
         foreach ($categories as $category) {
             $tabs[$category] = Tab::make()->query(fn($query) => $query->where('category', $category));
         }

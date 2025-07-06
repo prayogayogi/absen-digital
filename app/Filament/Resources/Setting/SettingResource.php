@@ -9,6 +9,7 @@ use Filament\Forms\Form;
 use Filament\Tables\Table;
 use Filament\Resources\Resource;
 use App\Filament\Resources\Setting\SettingResource\Pages;
+use Filament\Tables\Filters\SelectFilter;
 
 class SettingResource extends Resource
 {
@@ -21,19 +22,6 @@ class SettingResource extends Resource
     protected static ?string $navigationIcon = 'heroicon-o-cog-6-tooth';
 
     protected static ?string $slug = 'setting';
-
-    public static function getPermissionPrefixes(): array
-    {
-        return [
-            'view',
-            'view_any',
-            'create',
-            'update',
-            'delete',
-            'delete_any',
-            'publish'
-        ];
-    }
 
     public static function form(Form $form): Form
     {
@@ -113,18 +101,24 @@ class SettingResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('key')
-                    ->searchable()
-                    ->toggleable(),
-                Tables\Columns\TextColumn::make('category')
-                    ->toggleable(),
+                    ->searchable(),
+                Tables\Columns\TextColumn::make('category'),
                 Tables\Columns\TextColumn::make('type'),
                 Tables\Columns\TextColumn::make('created_at')
                     ->label('Created Date')
-                    ->date()
-                    ->toggleable(),
+                    ->date(),
             ])
             ->filters([
-                //
+                SelectFilter::make('type')
+                    ->label('Type')
+                    ->options([
+                        'text' => 'Text',
+                        'textarea' => 'Textarea',
+                        'file' => 'File',
+                    ])
+                    ->placeholder('All Types')
+                    ->searchable()
+                    ->default(null),
             ])
             ->groups([
                 Tables\Grouping\Group::make('created_at')
