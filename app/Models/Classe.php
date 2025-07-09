@@ -13,7 +13,8 @@ class Classe extends Model
 
     protected $fillable = [
         'name',
-        'user_id',
+        'academic_year_id',
+        'homeroom_teacher_id',
     ];
 
     public function student(): HasMany

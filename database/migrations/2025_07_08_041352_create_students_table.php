@@ -15,14 +15,14 @@ return new class extends Migration
             $table->id();
             $table->string('nisn')->unique();
             $table->string('name');
-            $table->string('gender');
+            $table->string('gender')->nullable();
             $table->date('birth_date')->nullable();
             $table->string('birth_place')->nullable();
             $table->string('address')->nullable();
             $table->string('phone')->nullable();
             $table->string('email')->nullable();
             $table->string('photo')->nullable();
-            $table->bigInteger('class_id')->unsigned();
+            $table->foreignId('class_id')->constrained('classes')->onDelete('cascade');
             $table->string('parent_name')->nullable();
             $table->string('parent_phone')->nullable();
 

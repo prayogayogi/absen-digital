@@ -18,7 +18,6 @@ class QrCodeController extends Controller
             return response()->json(['status' => 'error', 'message' => 'Siswa tidak ditemukan.'], 404);
         }
 
-        // Cek apakah sudah absen hari ini (opsional)
         $alreadyAttended = Attendance::whereDate('created_at', now()->toDateString())
             ->where('student_id', $student->id)
             ->exists();

@@ -5,16 +5,14 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Attendance extends Model
+class TeacherAttendance extends Model
 {
     use HasFactory;
-
     protected $fillable = [
-        'student_id',
-        'attendance_date',
+        'user_id',
+        'date',
         'time_in',
         'time_out',
         'status',
-        'type',
     ];
 }
