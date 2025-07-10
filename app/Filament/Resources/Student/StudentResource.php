@@ -35,15 +35,71 @@ class StudentResource extends Resource
                             ->schema([
                                 Forms\Components\TextInput::make('nisn')
                                     ->label('Nomor Induk Siswa Nasional (NISN)')
+                                    ->placeholder('Masukkan NISN')
+                                    ->numeric()
+                                    ->unique(Student::class, 'nisn', ignorable: fn($record) => $record)
                                     ->required()
                                     ->maxLength(15),
                                 Forms\Components\TextInput::make('name')
                                     ->label('Nama Siswa')
+                                    ->placeholder('Masukkan nama siswa')
                                     ->required(),
+                                Forms\Components\Select::make('gender')
+                                    ->label('Jenis Kelamin')
+                                    ->placeholder('Pilih jenis kelamin')
+                                    ->options([
+                                        'L' => 'Laki-laki',
+                                        'P' => 'Perempuan',
+                                    ]),
+                                Forms\Components\TextInput::make('birth_place')
+                                    ->label('Tempat Lahir')
+                                    ->placeholder('Masukkan tempat lahir')
+                                    ->maxLength(100),
+                                Forms\Components\DatePicker::make('birth_date')
+                                    ->label('Tanggal Lahir')
+                                    ->placeholder('Pilih tanggal lahir')
+                                    ->date()
+                                    ->maxDate(now())
+                                    ->displayFormat('d F Y')
+                                    ->placeholder('Pilih tanggal lahir'),
+                                Forms\Components\TextInput::make('address')
+                                    ->label('Alamat')
+                                    ->placeholder('Masukkan alamat siswa')
+                                    ->helperText('Alamat lengkap siswa')
+                                    ->maxLength(255),
+                                Forms\Components\TextInput::make('phone')
+                                    ->label('Nomor Handphone')
+                                    ->placeholder('Masukkan nomor handphone siswa')
+                                    ->helperText('Nomor handphone siswa untuk komunikasi')
+                                    ->tel()
+                                    ->maxLength(15),
+                                Forms\Components\TextInput::make('email')
+                                    ->label('Email')
+                                    ->placeholder('Masukkan email siswa')
+                                    ->email()
+                                    ->required()
+                                    ->maxLength(255),
+                                Forms\Components\FileUpload::make('photo')
+                                    ->label('Foto Siswa')
+                                    ->placeholder('Unggah foto siswa')
+                                    ->image()
+                                    ->disk('public')
+                                    ->directory('students')
+                                    ->visibility('public')
+                                    ->maxSize(1024) // 1 MB
+                                    ->acceptedFileTypes(['image/jpeg', 'image/png'])
+                                    ->columnSpanFull()
+                                    ->helperText('Format: JPG, PNG. Maksimal ukuran: 1 MB'),
                                 Forms\Components\TextInput::make('parent_name')
-                                    ->label('Nama Orang Tua'),
+                                    ->label('Nama Wali')
+                                    ->placeholder('Masukkan nama orang tua/wali siswa'),
                                 Forms\Components\TextInput::make('parent_phone')
-                                    ->label('Nomor HanPhone Orang Tua')
+                                    ->label('Nomor handphone Orang Tua')
+                                    ->placeholder('Masukkan nomor handphone orang tua/wali siswa')
+                                    ->helperText('Nomor handphone orang tua/wali siswa untuk komunikasi')
+                                    ->required()
+                                    ->numeric()
+                                    ->unique(Student::class, 'parent_phone', ignorable: fn($record) => $record)
                                     ->tel()
                                     ->maxLength(15),
                             ]),
@@ -95,35 +151,48 @@ class StudentResource extends Resource
                             ->createOptionForm([
                                 Forms\Components\TextInput::make('name')
                                     ->label('Nama Kelas')
+                                    ->placeholder('Masukkan nama kelas')
+                                    ->helperText('Contoh: Kelas 10A, Kelas 11B')
                                     ->required()
                                     ->maxLength(255),
-                                Forms\Components\Select::make('user_id')
+
+                                Forms\Components\TextInput::make('academic_year')
+                                    ->label('Tahun Ajaran')
+                                    ->placeholder('Masukkan tahun ajaran')
+                                    ->helperText('Contoh: 2023/2024')
                                     ->required()
-                                    ->label('Nama Pengajar')
+                                    ->maxLength(10),
+
+                                Forms\Components\Select::make('homeroom_teacher_id')
+                                    ->label('Wali Kelas')
+                                    ->placeholder('Pilih Wali Kelas')
+                                    ->helperText('Pilih wali kelas untuk kelas ini')
+                                    ->required()
                                     ->options(function () {
-                                        return User::whereHas('roles', function ($query) {
-                                            $query->where('name', 'guru');
-                                        })
+                                        $usedTeacherIds = Classe::pluck('homeroom_teacher_id')->filter()->toArray();
+                                        return User::role('guru')
+                                            ->whereNotIn('id', $usedTeacherIds)
                                             ->orderBy('name')
                                             ->pluck('name', 'id')
                                             ->toArray();
                                     })
                                     ->searchable()
-                                    ->loadingMessage('Memuat daftar pengajar...')
-                                    ->noSearchResultsMessage('Pengajar tidak ditemukan')
-                                    ->searchPrompt('Ketik nama pengajar...')
+                                    ->loadingMessage('Memuat daftar Wali Kelas...')
+                                    ->noSearchResultsMessage('Wali Kelas tidak ditemukan')
+                                    ->searchPrompt('Ketik nama Wali Kelas...'),
                             ])
                             ->createOptionUsing(function (array $data) {
                                 try {
                                     $newClasse = Classe::create($data);
                                     cache()->forget('class_id_options');
-                                    return $newClasse->id;
 
                                     Notification::make()
                                         ->title('Berhasil')
-                                        ->body('Kelas Berhasil ditambahkan')
+                                        ->body('Kelas berhasil ditambahkan')
                                         ->success()
                                         ->send();
+
+                                    return $newClasse->id;
                                 } catch (\Exception $e) {
                                     Notification::make()
                                         ->title('Error')
@@ -138,13 +207,9 @@ class StudentResource extends Resource
                                 if ($state) {
                                     $kelas = Classe::find($state);
 
-                                    if ($kelas) {
-                                        $set('class_name', $kelas->name);
-                                    } else {
-                                        $set('class_name', null);
-                                    }
+                                    $set('class_name', $kelas?->name);
 
-                                    if (!Classe::where('id', $state)->exists()) {
+                                    if (!$kelas) {
                                         $set('class_id', null);
                                         cache()->forget('class_id_options');
                                     }
@@ -176,12 +241,12 @@ class StudentResource extends Resource
                     ->sortable(),
             ])
             ->filters([
-                SelectFilter::make('class_id')
-                    ->label('Kelas')
-                    ->searchable()
-                    ->options(function () {
-                        return Classe::orderBy('name')->pluck('name', 'id')->toArray();
-                    })
+                // SelectFilter::make('class_id')
+                //     ->label('Kelas')
+                //     ->searchable()
+                //     ->options(function () {
+                //         return Classe::orderBy('name')->pluck('name', 'id')->toArray();
+                //     })
             ])
             ->actions([
                 Tables\Actions\ViewAction::make(),

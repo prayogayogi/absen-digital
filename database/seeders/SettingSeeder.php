@@ -16,14 +16,7 @@ class SettingSeeder extends Seeder
         Setting::create([
             'key'       => 'app_name',
             'value'     => env('APP_NAME') ?? '...',
-            'name'      => 'Application Name',
-            'type'      => 'text',
-            'category'  => 'information'
-        ]);
-        Setting::create([
-            'key'       => 'app_short_name',
-            'value'     => env('APP_NAME') ?? '...',
-            'name'      => 'Application Short Name',
+            'name'      => 'Nama Aplikasi',
             'type'      => 'text',
             'category'  => 'information'
         ]);
@@ -31,7 +24,7 @@ class SettingSeeder extends Seeder
             'key'       => 'app_logo',
             'value'     => 'storage/default.png',
             'value_file' => '["settings\/default.png"]',
-            'name'      => 'Application Logo',
+            'name'      => 'Logo Aplikasi',
             'type'      => 'file',
             'ext'       => 'png',
             'category'  => 'information'
@@ -40,10 +33,26 @@ class SettingSeeder extends Seeder
             'key'       => 'app_favicon',
             'value'     => 'storage/default.png',
             'value_file'     => '["settings\/default.png"]',
-            'name'      => 'Application Favicon',
+            'name'      => 'Favicon Aplikasi',
             'type'      => 'file',
             'ext'       => 'png',
             'category'  => 'information'
+        ]);
+        Setting::create([
+            'key'       => 'jam_masuk',
+            'value'     => '07:00',
+            'name'      => 'Jam Masuk',
+            'type'      => 'text',
+            'ext'       => 'png',
+            'category'  => 'Jam Sekolah'
+        ]);
+        Setting::create([
+            'key'       => 'jam_pulang',
+            'value'     => '15:00',
+            'name'      => 'Jam Pulang',
+            'type'      => 'text',
+            'ext'       => 'png',
+            'category'  => 'Jam Sekolah'
         ]);
     }
 }

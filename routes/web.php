@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AttendanceController;
 use App\Models\Student;
 use App\Models\Attendance;
 use Illuminate\Support\Facades\Route;
@@ -20,4 +21,7 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::post('/scan-absen', [QrCodeController::class, 'scan'])->name('scan.absen');
+Route::middleware(['auth', 'verified'])->group(function () {
+    Route::get('/admin/attendance', [AttendanceController::class, 'index'])->name('attendance');
+    Route::post('/scan-absen', [QrCodeController::class, 'scan'])->name('scan.absen');
+});

@@ -32,8 +32,7 @@ class QrCodeController extends Controller
             'attendance_date' => now(),
         ]);
 
-        $token = 'UNRcjxuZMgwyQs3mFBci';
-
+        $token = env('TOKEN_FONNTE');
 
         $curl = curl_init();
 
@@ -48,7 +47,7 @@ class QrCodeController extends Controller
             CURLOPT_CUSTOMREQUEST => 'POST',
             CURLOPT_POSTFIELDS => array(
                 'target' => $student->parent_phone,
-                'message' => 'Siwa dengan nama ' . $student->name . ' sudah absen masuk pada Jam ' . now()->format('H:i') . ' WIB',
+                'message' => 'Selamat Pagi Bapak/Ibu Siswa/Siswi dengan nama ' . $student->name . ' sudah absen masuk pada Jam ' . now()->format('H:i') . ' WIB',
             ),
             CURLOPT_HTTPHEADER => array(
                 "Authorization: $token"

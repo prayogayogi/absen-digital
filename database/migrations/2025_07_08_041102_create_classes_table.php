@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('classes', function (Blueprint $table) {
             $table->id();
             $table->string('name')->unique();
-            $table->foreignId('academic_year_id')->constrained()->onDelete('cascade');
+            $table->string('academic_year');
             $table->bigInteger('homeroom_teacher_id')->nullable()->constrained('users')->onDelete('set null');
             $table->timestamps();
         });

@@ -41,9 +41,6 @@
         <div x-cloak x-show="open" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
             <div
                 class="bg-white dark:bg-gray-900 rounded-xl p-6 w-full max-w-md shadow relative"
-                {{-- HAPUS BARIS INI:
-                @click.outside="open = false"
-                --}}
             >
                 {{-- Tombol X kanan atas --}}
                 <button
